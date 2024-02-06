@@ -36,3 +36,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### XML ###
+encodings.xml
+jpa-buddy.xml
+misc.xml
+vcs.xml
+workspace.xml

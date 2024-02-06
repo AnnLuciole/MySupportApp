@@ -44,6 +44,7 @@ public class SupportServletTest {
 
         verify(response).setContentType(CONTENT_TYPE);
         verify(response).setCharacterEncoding(ENCODING);
+        verify(writer).printf(anyString(), eq(PHRASE));
     }
 
     @Test
