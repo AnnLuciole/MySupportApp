@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  tomcat:
+    image: tomcat:9.0
+    ports:
+      - "8080:8080"
+    container_name: tomcat
+    volumes:
+      - .target/myHomework.war:/usr/local/tomcat/webapps/myHomework.war
+    restart: on-failure
