@@ -34,8 +34,8 @@ public class ApplicationContext {
                 .forEach(x -> {
                     Object bean;
                     try {
-                        bean = x.invoke(x.getDeclaringClass().newInstance());
-                    } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                        bean = x.invoke(getBean(x.getDeclaringClass()));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
                     if (Objects.nonNull(bean)) {
@@ -47,6 +47,7 @@ public class ApplicationContext {
     private List<?> getAllConfigurationsClass() {
         return reflections.getTypesAnnotatedWith(Configuration.class).stream().map(type -> {
             try {
+                allBeans.put(type, type.newInstance());
                 return type.newInstance();
             } catch (IllegalAccessException | InstantiationException e) {
                 throw new RuntimeException(e);
@@ -63,8 +64,8 @@ public class ApplicationContext {
                 .filter(x -> Objects.nonNull(x.getAnnotation(Autowired.class)))
                 .forEach(x -> {
                     try {
-                        x.invoke(beanEntry.getKey().newInstance(), getBean(x.getParameterTypes()[0]));
-                    } catch (IllegalAccessException | InvocationTargetException |InstantiationException e) {
+                        x.invoke(beanEntry.getValue(), getBean(x.getParameterTypes()[0]));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
                 });
