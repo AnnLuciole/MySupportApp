@@ -5,7 +5,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PhraseContainer {
 
-    private final static List<String> allPhrases;
+    private static final List<String> allPhrases;
 
     static {
         allPhrases = new CopyOnWriteArrayList<>();

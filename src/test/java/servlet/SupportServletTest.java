@@ -27,11 +27,12 @@ public class SupportServletTest {
 
     @BeforeEach
     void setup() throws ServletException {
+        servlet = new SupportServlet();
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
         service = mock(SupportServiceImpl.class);
         writer = mock(PrintWriter.class);
-        servlet = new SupportServlet(service);
+        servlet.setSupportService(service);
     }
 
     @Test

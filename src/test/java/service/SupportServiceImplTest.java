@@ -19,9 +19,11 @@ public class SupportServiceImplTest {
 
     @BeforeEach
     void setup() {
+        service = new SupportServiceImpl();
         random = mock(Random.class);
         container = mock(PhraseContainer.class);
-        service = new SupportServiceImpl(random, container);
+        service.setContainer(container);
+        service.setRandom(random);
     }
 
     @Test
