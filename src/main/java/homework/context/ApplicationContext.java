@@ -1,11 +1,15 @@
 package homework.context;
 
-import homework.annotation.Autowired;
-import homework.annotation.Bean;
-import homework.annotation.Configuration;
+import homework.annotation.*;
+import homework.enums.MappingType;
+import homework.handler.LoggingInvocationHandler;
+import homework.rest.SupportController;
+import homework.util.ControllersContainer;
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +22,8 @@ public class ApplicationContext {
     private final Reflections reflections;
 
     private final Map<Class<?>, Object> allBeans = new ConcurrentHashMap<>();
+
+    private final ControllersContainer container = new ControllersContainer();
 
     public ApplicationContext(){
         reflections = new Reflections("java.homework");
@@ -39,7 +45,15 @@ public class ApplicationContext {
                         throw new RuntimeException(e);
                     }
                     if (Objects.nonNull(bean)) {
-                        allBeans.put(bean.getClass(), bean);
+                        if (Arrays.stream(bean.getClass().getDeclaredMethods())
+                                .anyMatch(y -> y.isAnnotationPresent(Logging.class))) {
+                            allBeans.put(bean.getClass(), wrapWithLoggingProxy(bean));
+                        } else {
+                            allBeans.put(bean.getClass(), bean);
+                        }
+                        if (bean.getClass().isAnnotationPresent(Controller.class)) {
+                            putController(bean);
+                        }
                     }
                 });
     }
@@ -80,5 +94,29 @@ public class ApplicationContext {
             }
         }
         return allBeans.get(beanClass);
+    }
+
+    private void putController(Object object) {
+        String classPath = object.getClass().getAnnotation(Mapping.class).path();
+        container.addNewController(classPath, (SupportController) object);
+        Arrays.stream(object.getClass().getDeclaredMethods())
+                .filter(x -> x.isAnnotationPresent(Mapping.class))
+                .forEach(z -> {
+                    MappingType type = z.getAnnotation(Mapping.class).type();
+                    String path = z.getAnnotation(Mapping.class).path();
+                    if (Objects.nonNull(path)) {
+                        path = z.getDeclaringClass().getAnnotation(Mapping.class).path() + path;
+                        container.addNewController(path, (SupportController) object);
+                    }
+                    container.addNewMethod(path, type, z);
+                });
+    }
+
+    private Object wrapWithLoggingProxy(Object object) {
+        InvocationHandler handler = new LoggingInvocationHandler(object);
+        allBeans.put(InvocationHandler.class, handler);
+        return Proxy.newProxyInstance(object.getClass().getClassLoader(),
+                object.getClass().getInterfaces(),
+                (InvocationHandler) allBeans.get(InvocationHandler.class));
     }
 }

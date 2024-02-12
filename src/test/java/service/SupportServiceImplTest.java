@@ -1,5 +1,6 @@
 package service;
 
+import homework.Phrase;
 import homework.service.SupportServiceImpl;
 import homework.util.PhraseContainer;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,10 +13,11 @@ import static org.mockito.Mockito.*;
 
 public class SupportServiceImplTest {
 
+    final String PHRASE = "Test phrase";
     Random random;
     PhraseContainer container;
     SupportServiceImpl service;
-    final String PHRASE = "Test phrase";
+    Phrase phrase = new Phrase(PHRASE);
 
     @BeforeEach
     void setup() {
@@ -29,19 +31,19 @@ public class SupportServiceImplTest {
     @Test
     void addNewPhraseTest() {
 
-        service.addNewPhrase(PHRASE);
+        service.addNewPhrase(phrase);
 
-        verify(container).addNewPhrase(PHRASE);
+        verify(container).addNewPhrase(phrase);
     }
 
     @Test
     void getRandomPhrase() {
 
         when(random.nextInt(anyInt())).thenReturn(5);
-        when(container.getPhrase(5)).thenReturn(PHRASE);
+        when(container.getPhrase(5)).thenReturn(phrase);
 
-        String result = service.getRandomPhrase();
+        Phrase result = service.getRandomPhrase();
 
-        assertEquals(PHRASE, result);
+        assertEquals(phrase, result);
     }
 }

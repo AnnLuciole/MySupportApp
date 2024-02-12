@@ -1,5 +1,6 @@
 package homework.service;
 
+import homework.Phrase;
 import homework.annotation.Autowired;
 import homework.util.PhraseContainer;
 
@@ -20,12 +21,12 @@ public class SupportServiceImpl implements SupportService {
     }
 
     @Override
-    public void addNewPhrase(String phrase) {
-        container.addNewPhrase(phrase);
+    public boolean addNewPhrase(Phrase phrase) {
+        return container.addNewPhrase(phrase);
     }
 
     @Override
-    public String getRandomPhrase() {
+    public Phrase getRandomPhrase() {
         int randomIndex = random.nextInt(container.getSize());
         return container.getPhrase(randomIndex);
     }

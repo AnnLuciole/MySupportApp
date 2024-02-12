@@ -2,9 +2,12 @@ package homework.configuration;
 
 import homework.annotation.Bean;
 import homework.annotation.Configuration;
+import homework.rest.MyDispatcherServlet;
+import homework.rest.SupportController;
+import homework.rest.SupportControllerImpl;
 import homework.service.SupportService;
 import homework.service.SupportServiceImpl;
-import homework.servlets.SupportServlet;
+import homework.util.ControllersContainer;
 import homework.util.PhraseContainer;
 
 import javax.servlet.http.HttpServlet;
@@ -18,12 +21,22 @@ public class SupportAppConfig {
     }
 
     @Bean
-    public HttpServlet supportServlet() {
-        return new SupportServlet();
+    public SupportController supportServlet() {
+        return new SupportControllerImpl();
+    }
+
+    @Bean
+    public HttpServlet myDispatcherServlet() {
+        return new MyDispatcherServlet();
     }
 
     @Bean
     public PhraseContainer phraseContainer() {
         return new PhraseContainer();
+    }
+
+    @Bean
+    public ControllersContainer controllersContainer() {
+        return new ControllersContainer();
     }
 }

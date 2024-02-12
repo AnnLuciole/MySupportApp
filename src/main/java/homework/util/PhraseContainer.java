@@ -1,24 +1,30 @@
 package homework.util;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import homework.Phrase;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PhraseContainer {
 
-    private static final List<String> allPhrases;
+    private static final Map<String, Phrase> allPhrases;
 
     static {
-        allPhrases = new CopyOnWriteArrayList<>();
-        allPhrases.add("У тебя все получится!");
-        allPhrases.add("Ты не один - всегда найдутся люди, готовые помочь.");
+        allPhrases = new ConcurrentHashMap<>();
+        allPhrases.put("У тебя все получится!", new Phrase("У тебя все получится!"));
+        allPhrases.put("Ты не один - всегда найдутся люди, готовые помочь.",
+                new Phrase("Ты не один - всегда найдутся люди, готовые помочь."));
     }
 
-    public void addNewPhrase(String phrase) {
-        allPhrases.add(phrase);
+    public boolean addNewPhrase(Phrase phrase) {
+        if (allPhrases.containsKey(phrase.getPhraseString())) return false;
+        allPhrases.put(phrase.getPhraseString(), phrase);
+        return true;
     }
 
-    public String getPhrase(int index) {
-        return allPhrases.get(index);
+    public Phrase getPhrase(int index) {
+        return new ArrayList<>(allPhrases.entrySet()).get(index).getValue();
     }
 
     public int getSize() {
