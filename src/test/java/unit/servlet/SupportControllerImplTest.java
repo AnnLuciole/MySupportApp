@@ -1,4 +1,4 @@
-package servlet;
+package unit.servlet;
 
 import homework.Phrase;
 import homework.service.SupportServiceImpl;

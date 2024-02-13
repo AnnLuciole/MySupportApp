@@ -10,7 +10,10 @@ public class SupportServiceImpl implements SupportService {
     private Random random;
     private PhraseContainer container;
 
-    @Autowired
+    public SupportServiceImpl(){
+        this.random = new Random();
+    }
+
     public void setRandom(Random random) {
         this.random = random;
     }
@@ -21,7 +24,7 @@ public class SupportServiceImpl implements SupportService {
     }
 
     @Override
-    public boolean addNewPhrase(Phrase phrase) {
+    public Boolean addNewPhrase(Phrase phrase) {
         return container.addNewPhrase(phrase);
     }
 

@@ -17,10 +17,10 @@ public class PhraseContainer {
                 new Phrase("Ты не один - всегда найдутся люди, готовые помочь."));
     }
 
-    public boolean addNewPhrase(Phrase phrase) {
-        if (allPhrases.containsKey(phrase.getPhraseString())) return false;
+    public Boolean addNewPhrase(Phrase phrase) {
+        if (allPhrases.containsKey(phrase.getPhraseString())) return Boolean.FALSE;
         allPhrases.put(phrase.getPhraseString(), phrase);
-        return true;
+        return Boolean.TRUE;
     }
 
     public Phrase getPhrase(int index) {

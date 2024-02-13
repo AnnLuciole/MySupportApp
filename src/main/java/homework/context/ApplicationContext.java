@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Context
@@ -16,10 +17,23 @@ public class ApplicationContext {
 
     private final Reflections reflections;
 
-    private final Map<Class<?>, Object> allBeans = new HashMap<>();
+    private final Map<Class<?>, Object> allBeans = new ConcurrentHashMap<>();
 
     public ApplicationContext(){
-        reflections = new Reflections("java.homework");
+        reflections = new Reflections("homework");
+        init();
+    }
+
+
+    public Map<Class<?>, Object> getAllBeans() {
+        return allBeans;
+    }
+
+    public Object getBeanForClass(Class<?> clazz) {
+        return allBeans.get(clazz);
+    }
+
+    private void init() {
         putAllBeans();
         injectAllBeanFields();
     }
@@ -35,8 +49,10 @@ public class ApplicationContext {
 
     private void putNewBean(Method method) {
         Object bean;
+        Class clazz;
         Object configClass = getBean(method.getDeclaringClass());
         try {
+            clazz  = method.getReturnType();
             bean = method.invoke(configClass);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
@@ -44,9 +60,9 @@ public class ApplicationContext {
         if (Objects.nonNull(bean)) {
             if (Arrays.stream(bean.getClass().getDeclaredMethods())
                     .anyMatch(y -> y.isAnnotationPresent(Logging.class))) {
-                allBeans.put(bean.getClass(), wrapWithLoggingProxy(bean));
+                allBeans.put(clazz, wrapWithLoggingProxy(bean));
             } else {
-                allBeans.put(bean.getClass(), bean);
+                allBeans.put(clazz, bean);
             }
         }
     }
@@ -63,15 +79,22 @@ public class ApplicationContext {
     }
 
     private void injectAllBeanFields() {
-        allBeans.entrySet().forEach(this::injectBeanFields);
+        Iterator iter = allBeans.entrySet().iterator();
+        while (iter.hasNext()){
+            injectBeanFields((Map.Entry<Class<?>, Object>) iter.next());
+        }
     }
 
     private void injectBeanFields(Map.Entry<Class<?>, Object> beanEntry) {
-        Arrays.stream(beanEntry.getKey().getDeclaredMethods()).distinct()
+        Arrays.stream(beanEntry.getValue().getClass().getDeclaredMethods()).distinct()
                 .filter(x -> Objects.nonNull(x.getAnnotation(Autowired.class)))
                 .forEach(x -> {
                     try {
-                        x.invoke(beanEntry.getValue(), getBean(x.getParameterTypes()[0]));
+                        if (x.getParameterTypes().length == 0) {
+                            x.invoke(beanEntry.getValue());
+                        } else {
+                            x.invoke(beanEntry.getValue(), getBean(x.getParameterTypes()[0]));
+                        }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
@@ -98,9 +121,5 @@ public class ApplicationContext {
         return Proxy.newProxyInstance(object.getClass().getClassLoader(),
                 object.getClass().getInterfaces(),
                 (InvocationHandler) allBeans.get(InvocationHandler.class));
-    }
-
-    public Map<Class<?>, Object> getAllBeans() {
-        return allBeans;
     }
 }

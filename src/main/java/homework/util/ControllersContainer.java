@@ -12,15 +12,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ControllersContainer {
 
     private ApplicationContext context;
-    private static final Map<String, SupportController> servlets;
-    private static final Map<String, Map<HttpMethod, Method>> mappings;
+    private final Map<String, SupportController> servlets;
+    private final Map<String, Map<HttpMethod, Method>> mappings;
 
-    static {
+    {
         servlets = new HashMap<>();
         mappings = new HashMap<>();
     }
@@ -61,7 +60,7 @@ public class ControllersContainer {
 
     private Map<HttpMethod, Method> getMethodsMap(String path) {
         if (Objects.isNull(mappings.get(path))) {
-            return new ConcurrentHashMap<>();
+            return new HashMap<>();
         }
         return mappings.get(path);
     }

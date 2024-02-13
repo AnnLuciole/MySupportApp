@@ -6,7 +6,7 @@ import homework.annotation.Logging;
 public interface SupportService {
 
     @Logging
-    boolean addNewPhrase(Phrase phrase);
+    Boolean addNewPhrase(Phrase phrase);
     @Logging
     Phrase getRandomPhrase();
 }

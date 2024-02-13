@@ -24,7 +24,6 @@ public class MyDispatcherServlet extends HttpServlet {
     @Autowired
     public void setContainer(ControllersContainer container) {
         this.container = container;
-        container.initContainer();
     }
 
     @Autowired
@@ -35,40 +34,49 @@ public class MyDispatcherServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        container.initContainer();
     }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String path = request.getContextPath();
-        SupportController controller = container.getController(path);
-        Method method = container.getMethod(path).get(HttpMethod.GET);
-        Phrase phrase;
-        try {
-            phrase = (Phrase) method.invoke(controller);
-        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-            phrase = null;
-        }
-        String responseStr = Objects.nonNull(phrase) ? mapper.writeValueAsString(phrase) : "Что-то пошло не так";
-        updateResponse(Objects.nonNull(phrase), responseStr, response);
+        Phrase responseObject = (Phrase) getResponseObject(request, HttpMethod.GET, null);
+        String responseStr = Objects.nonNull(responseObject) ? mapper.writeValueAsString(responseObject) : "Что-то пошло не так";
+        response = updateResponse(Objects.nonNull(responseObject), response);
+        PrintWriter out = response.getWriter();
+        out.println(responseStr);
+        out.flush();
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)  throws IOException {
-        String path = request.getContextPath();
-        SupportController controller = container.getController(path);
-        Method method = container.getMethod(path).get(HttpMethod.POST);
         Phrase phrase = mapper.readValue(request.getReader(), Phrase.class);
-        boolean answer;
-        try {
-            answer = (boolean) method.invoke(controller, phrase);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            answer = false;
-        }
-        String responseStr = answer ? "Успешно" : "Что-то пошло не так";
-        updateResponse(answer, responseStr, response);
+        Boolean responseObject = (Boolean) getResponseObject(request, HttpMethod.POST, phrase);
+        boolean result = Objects.nonNull(responseObject) && responseObject == Boolean.TRUE;
+        String responseStr = result ? "Успешно" : "Что-то пошло не так";
+        response = updateResponse(result, response);
+        PrintWriter out = response.getWriter();
+        out.println(responseStr);
+        out.flush();
     }
 
-    private void updateResponse(boolean type, String answer, HttpServletResponse response) throws IOException {
+    private Object getResponseObject(HttpServletRequest request, HttpMethod httpMethod, Phrase phrase) {
+        String path = request.getContextPath();
+        SupportController controller = container.getController(path);
+        Method method = container.getMethod(path).get(httpMethod);
+        Object answer;
+        try {
+            if (Objects.isNull(phrase)) {
+                answer = method.invoke(controller);
+            } else {
+                answer = method.invoke(controller, phrase);
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            answer = null;
+        }
+        return answer;
+    }
+
+    private HttpServletResponse updateResponse(boolean type, HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         if (type) {
@@ -76,8 +84,6 @@ public class MyDispatcherServlet extends HttpServlet {
         } else {
             response.setStatus(500);
         }
-        PrintWriter out = response.getWriter();
-        out.println(answer);
-        out.flush();
+        return response;
     }
 }
