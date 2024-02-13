@@ -3,7 +3,7 @@ package homework.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import homework.Phrase;
 import homework.annotation.Autowired;
-import homework.enums.MappingType;
+import homework.enums.HttpMethod;
 import homework.util.ControllersContainer;
 
 import javax.servlet.ServletException;
@@ -24,6 +24,7 @@ public class MyDispatcherServlet extends HttpServlet {
     @Autowired
     public void setContainer(ControllersContainer container) {
         this.container = container;
+        container.initContainer();
     }
 
     @Autowired
@@ -40,33 +41,22 @@ public class MyDispatcherServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = request.getContextPath();
         SupportController controller = container.getController(path);
-        Method method = container.getMethod(path).get(MappingType.GET);
+        Method method = container.getMethod(path).get(HttpMethod.GET);
         Phrase phrase;
         try {
             phrase = (Phrase) method.invoke(controller);
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
             phrase = null;
         }
-        String responseStr;
-        if (Objects.nonNull(phrase)) {
-            responseStr = mapper.writeValueAsString(phrase);
-            response.setStatus(200);
-        } else {
-            responseStr = "Что-то пошло не так";
-            response.setStatus(500);
-        }
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-        out.println(responseStr);
-        out.flush();
+        String responseStr = Objects.nonNull(phrase) ? mapper.writeValueAsString(phrase) : "Что-то пошло не так";
+        updateResponse(Objects.nonNull(phrase), responseStr, response);
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)  throws IOException {
         String path = request.getContextPath();
         SupportController controller = container.getController(path);
-        Method method = container.getMethod(path).get(MappingType.POST);
+        Method method = container.getMethod(path).get(HttpMethod.POST);
         Phrase phrase = mapper.readValue(request.getReader(), Phrase.class);
         boolean answer;
         try {
@@ -74,18 +64,20 @@ public class MyDispatcherServlet extends HttpServlet {
         } catch (IllegalAccessException | InvocationTargetException e) {
             answer = false;
         }
+        String responseStr = answer ? "Успешно" : "Что-то пошло не так";
+        updateResponse(answer, responseStr, response);
+    }
+
+    private void updateResponse(boolean type, String answer, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        String responseStr;
-        if (answer) {
+        if (type) {
             response.setStatus(200);
-            responseStr = "Успешно";
         } else {
             response.setStatus(500);
-            responseStr = "Что-то пошло не так";
         }
         PrintWriter out = response.getWriter();
-        out.println(responseStr);
+        out.println(answer);
         out.flush();
     }
 }

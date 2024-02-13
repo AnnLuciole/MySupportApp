@@ -1,6 +1,6 @@
 package homework.enums;
 
-public enum MappingType {
+public enum HttpMethod {
 
     DELETE,
     GET,
