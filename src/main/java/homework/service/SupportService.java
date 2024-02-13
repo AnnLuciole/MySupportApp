@@ -1,7 +1,12 @@
 package homework.service;
 
+import homework.Phrase;
+import homework.annotation.Logging;
+
 public interface SupportService {
 
-    void addNewPhrase(String phrase);
-    String getRandomPhrase();
+    @Logging
+    Boolean addNewPhrase(Phrase phrase);
+    @Logging
+    Phrase getRandomPhrase();
 }
