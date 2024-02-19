@@ -1,31 +1,31 @@
 package homework.service;
 
-import homework.Phrase;
-import homework.annotation.Autowired;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import homework.entity.Phrase;
 import homework.util.PhraseContainer;
+import inMemoryBrokerLib.service.MessagePublisher;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Random;
+
+@Service
+@RequiredArgsConstructor
 public class SupportServiceImpl implements SupportService {
 
-    private Random random;
-    private PhraseContainer container;
-
-    public SupportServiceImpl(){
-        this.random = new Random();
-    }
-
-    public void setRandom(Random random) {
-        this.random = random;
-    }
-
-    @Autowired
-    public void setContainer(PhraseContainer container) {
-        this.container = container;
-    }
+    private final Random random;
+    private final PhraseContainer container;
+    private final MessagePublisher publisher;
+    private final ObjectMapper mapper;
 
     @Override
     public Boolean addNewPhrase(Phrase phrase) {
-        return container.addNewPhrase(phrase);
+        try {
+            return publisher.publishMessage(mapper.writeValueAsString(phrase));
+        } catch (JsonProcessingException e) {
+            return false;
+        }
     }
 
     @Override

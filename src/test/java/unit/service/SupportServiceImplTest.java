@@ -1,8 +1,11 @@
 package unit.service;
 
-import homework.Phrase;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import homework.entity.Phrase;
 import homework.service.SupportServiceImpl;
 import homework.util.PhraseContainer;
+import inMemoryBrokerLib.service.MessagePublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,29 +14,33 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class SupportServiceImplTest {
+class SupportServiceImplTest {
 
-    final String PHRASE = "Test phrase";
-    Random random;
-    PhraseContainer container;
-    SupportServiceImpl service;
-    Phrase phrase = new Phrase(PHRASE);
+    private final String PHRASE = "Test phrase";
+    private final Phrase phrase = new Phrase(PHRASE);
+    private Random random;
+    private PhraseContainer container;
+    private MessagePublisher publisher;
+    private ObjectMapper mapper;
+
+    private SupportServiceImpl service;
 
     @BeforeEach
     void setup() {
-        service = new SupportServiceImpl();
         random = mock(Random.class);
         container = mock(PhraseContainer.class);
-        service.setContainer(container);
-        service.setRandom(random);
+        publisher = mock(MessagePublisher.class);
+        mapper = mock(ObjectMapper.class);
+        service = new SupportServiceImpl(random, container, publisher, mapper);
     }
 
     @Test
-    void addNewPhraseTest() {
+    void addNewPhraseTest() throws JsonProcessingException {
 
         service.addNewPhrase(phrase);
+        String message = mapper.writeValueAsString(phrase);
 
-        verify(container).addNewPhrase(phrase);
+        verify(publisher).publishMessage(message);
     }
 
     @Test

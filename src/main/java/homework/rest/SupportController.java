@@ -1,6 +1,6 @@
 package homework.rest;
 
-import homework.Phrase;
+import homework.entity.Phrase;
 
 public interface SupportController {
 
