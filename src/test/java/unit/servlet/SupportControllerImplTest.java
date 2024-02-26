@@ -1,26 +1,26 @@
 package unit.servlet;
 
-import homework.Phrase;
-import homework.service.SupportServiceImpl;
+import homework.entity.Phrase;
 import homework.rest.SupportControllerImpl;
+import homework.service.SupportServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class SupportControllerImplTest {
+class SupportControllerImplTest {
 
-    final String PHRASE = "Test phrase";
+    private final String PHRASE = "Test phrase";
+    private final Phrase phrase = new Phrase(PHRASE);
     private SupportServiceImpl service;
-    private SupportControllerImpl servlet;
-    private Phrase phrase = new Phrase(PHRASE);
+    private SupportControllerImpl controller;
 
     @BeforeEach
     void setup() {
-        servlet = new SupportControllerImpl();
         service = mock(SupportServiceImpl.class);
-        servlet.setSupportService(service);
+        controller = new SupportControllerImpl(service);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class SupportControllerImplTest {
 
         when(service.getRandomPhrase()).thenReturn(phrase);
 
-        Phrase result = servlet.getSupportPhrase();
+        Phrase result = controller.getSupportPhrase();
 
         assertEquals(phrase, result);
 
@@ -39,7 +39,7 @@ public class SupportControllerImplTest {
 
         when(service.addNewPhrase(phrase)).thenReturn(true);
 
-        boolean result = servlet.addSupportPhrase(phrase);
+        boolean result = controller.addSupportPhrase(phrase);
 
         assertTrue(result);
     }
@@ -48,7 +48,7 @@ public class SupportControllerImplTest {
 
         when(service.addNewPhrase(phrase)).thenReturn(false);
 
-        boolean result = servlet.addSupportPhrase(phrase);
+        boolean result = controller.addSupportPhrase(phrase);
 
         assertFalse(result);
     }

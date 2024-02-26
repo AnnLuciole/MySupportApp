@@ -1,6 +1,6 @@
 package homework.util;
 
-import homework.Phrase;
+import homework.entity.Phrase;
 
 import java.util.ArrayList;
 import java.util.Map;

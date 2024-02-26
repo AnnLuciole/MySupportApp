@@ -1,12 +1,9 @@
 package homework.service;
 
-import homework.Phrase;
-import homework.annotation.Logging;
+import homework.entity.Phrase;
 
 public interface SupportService {
 
-    @Logging
     Boolean addNewPhrase(Phrase phrase);
-    @Logging
     Phrase getRandomPhrase();
 }

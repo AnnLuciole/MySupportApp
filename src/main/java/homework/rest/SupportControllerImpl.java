@@ -1,30 +1,32 @@
 package homework.rest;
 
-import homework.Phrase;
-import homework.annotation.Autowired;
-import homework.annotation.Controller;
-import homework.annotation.Mapping;
-import homework.enums.HttpMethod;
+import homework.annotation.Logging;
+import homework.entity.Phrase;
 import homework.service.SupportService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@Mapping(path = "/v1/support")
+@RestController
+@RequestMapping(path = "/v1/support")
+@RequiredArgsConstructor
 public class SupportControllerImpl implements SupportController {
 
-    private SupportService supportService;
-
     @Autowired
-    public void setSupportService(SupportService supportService) {
-        this.supportService = supportService;
-    }
+    private final SupportService supportService;
 
-    @Mapping(path = "/", type = HttpMethod.GET)
+
+    @Logging
+    @GetMapping(path = "/")
     public Phrase getSupportPhrase() {
-        Phrase phrase = supportService.getRandomPhrase();
-        return phrase;
+        return supportService.getRandomPhrase();
     }
 
-    @Mapping(path = "/", type = HttpMethod.POST)
+    @Logging
+    @PostMapping(path = "/")
     public Boolean addSupportPhrase(Phrase phrase) {
         return supportService.addNewPhrase(phrase);
     }
