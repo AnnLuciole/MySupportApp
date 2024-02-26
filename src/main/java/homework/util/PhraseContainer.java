@@ -1,30 +1,28 @@
 package homework.util;
 
 import homework.entity.Phrase;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+@Component
 public class PhraseContainer {
 
-    private static final Map<String, Phrase> allPhrases;
+    private static final List<Phrase> allPhrases;
 
     static {
-        allPhrases = new ConcurrentHashMap<>();
-        allPhrases.put("У тебя все получится!", new Phrase("У тебя все получится!"));
-        allPhrases.put("Ты не один - всегда найдутся люди, готовые помочь.",
-                new Phrase("Ты не один - всегда найдутся люди, готовые помочь."));
+        allPhrases = new CopyOnWriteArrayList<>();
     }
 
-    public Boolean addNewPhrase(Phrase phrase) {
-        if (allPhrases.containsKey(phrase.getPhraseString())) return Boolean.FALSE;
-        allPhrases.put(phrase.getPhraseString(), phrase);
-        return Boolean.TRUE;
+    public void addNewPhrase(Phrase phrase) {
+        System.out.println(phrase.getPhraseString());
+        allPhrases.add(phrase);
+        System.out.println(allPhrases.size());
     }
 
     public Phrase getPhrase(int index) {
-        return new ArrayList<>(allPhrases.entrySet()).get(index).getValue();
+        return allPhrases.get(index);
     }
 
     public int getSize() {

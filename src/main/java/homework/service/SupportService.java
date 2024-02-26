@@ -4,6 +4,6 @@ import homework.entity.Phrase;
 
 public interface SupportService {
 
-    Boolean addNewPhrase(Phrase phrase);
+    void addNewPhrase(Phrase phrase);
     Phrase getRandomPhrase();
 }
