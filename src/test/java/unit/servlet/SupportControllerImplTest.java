@@ -7,8 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class SupportControllerImplTest {
 
@@ -20,7 +19,8 @@ class SupportControllerImplTest {
     @BeforeEach
     void setup() {
         service = mock(SupportServiceImpl.class);
-        controller = new SupportControllerImpl(service);
+        controller = new SupportControllerImpl();
+        controller.setSupportService(service);
     }
 
     @Test
@@ -35,21 +35,10 @@ class SupportControllerImplTest {
     }
 
     @Test
-    void addSupportPhraseWhenTrue() {
+    void addSupportPhrase() {
 
-        when(service.addNewPhrase(phrase)).thenReturn(true);
+        controller.addSupportPhrase(phrase);
 
-        boolean result = controller.addSupportPhrase(phrase);
-
-        assertTrue(result);
-    }
-    @Test
-    void addSupportPhraseWhenFalse() {
-
-        when(service.addNewPhrase(phrase)).thenReturn(false);
-
-        boolean result = controller.addSupportPhrase(phrase);
-
-        assertFalse(result);
+        verify(service).addNewPhrase(phrase);
     }
 }

@@ -3,20 +3,17 @@ package homework.rest;
 import homework.annotation.Logging;
 import homework.entity.Phrase;
 import homework.service.SupportService;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Data
 @RestController
 @RequestMapping(path = "/v1/support")
-@RequiredArgsConstructor
 public class SupportControllerImpl implements SupportController {
 
     @Autowired
-    private final SupportService supportService;
+    private SupportService supportService;
 
 
     @Logging
@@ -27,7 +24,7 @@ public class SupportControllerImpl implements SupportController {
 
     @Logging
     @PostMapping(path = "/")
-    public Boolean addSupportPhrase(Phrase phrase) {
-        return supportService.addNewPhrase(phrase);
+    public void addSupportPhrase(@RequestBody Phrase phrase) {
+        supportService.addNewPhrase(phrase);
     }
 }

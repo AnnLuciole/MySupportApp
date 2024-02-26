@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+kafka-broker:
+  enabled: false
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9093
+    topic-name: phrase-topic

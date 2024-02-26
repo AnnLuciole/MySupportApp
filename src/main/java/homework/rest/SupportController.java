@@ -6,5 +6,5 @@ public interface SupportController {
 
     Phrase getSupportPhrase();
 
-    Boolean addSupportPhrase(Phrase phrase);
+    void addSupportPhrase(Phrase phrase);
 }
