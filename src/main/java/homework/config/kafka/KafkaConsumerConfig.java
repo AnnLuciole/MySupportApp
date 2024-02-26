@@ -13,6 +13,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Configuration
 @ConditionalOnProperty(prefix = "kafka-broker", name = "enabled", havingValue = "true")
@@ -28,8 +29,10 @@ public class KafkaConsumerConfig {
 
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
+        props.put(ConsumerConfig.CLIENT_ID_CONFIG, "support_phrase_client_id");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         DefaultKafkaConsumerFactory<String, String> objectObjectDefaultKafkaConsumerFactory =
                 new DefaultKafkaConsumerFactory<>(props);
         objectObjectDefaultKafkaConsumerFactory.setValueDeserializer(deserializer);
